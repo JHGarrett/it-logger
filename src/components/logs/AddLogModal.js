@@ -1,16 +1,26 @@
 import React, {useState} from 'react';
+import {connect} from 'react-redux';
+import PropTypes from 'prop-types';
+import {addLog} from '../../actions/logActions';
 import M from 'materialize-css/dist/js/materialize.min.js';
 
-const AddLogModal = () => {
+const AddLogModal = ({ addLog }) => {
     const [message, setMessage] = useState('');
     const [attention, setAttention] = useState(false);
     const [tech, setTech] = useState('');
 
     const onSubmit = () => {
-        if(message === '' || tech === ''){
-            M.toast({ html: 'Please enter a message and tech'})
+        if (message === '' || tech === '') {
+            M.toast({html: 'Please enter a message or tech'});
         } else {
-            console.log(message, tech, attention);
+            const newLog = {
+                message,
+                attention,
+                tech,
+                date: new Date()
+            };
+            addLog(newLog);
+            M.toast({html: `Log added by ${tech}`});
             // clear fields
             setMessage(' ');
             setTech(' ');
@@ -18,7 +28,7 @@ const AddLogModal = () => {
 
         }
 
-    }
+    };
 
     return (
         <div id="add-log-modal" className="modal" style={modalStyle}>
@@ -32,7 +42,8 @@ const AddLogModal = () => {
                 </div>
                 <div className="row">
                     <div className="input-field">
-                        <select name="tech" value={tech} className={'browser-default'} onChange={e => setTech(e.target.value)}>
+                        <select name="tech" value={tech} className={'browser-default'}
+                                onChange={e => setTech(e.target.value)}>
                             <option value="" disabled>Select Technician</option>
                             <option value="John Doe">John Doe</option>
                             <option value="Sam Smith">Sam Smith</option>
@@ -45,7 +56,8 @@ const AddLogModal = () => {
                     <div className="input-field">
                         <p>
                             <label>
-                                <input type="checkbox" className={'filled-in'} checked={attention} value={attention} onChange={e => setAttention(!attention)}/>
+                                <input type="checkbox" className={'filled-in'} checked={attention} value={attention}
+                                       onChange={e => setAttention(!attention)}/>
                                 <span>Needs Attention</span>
                             </label>
                         </p>
@@ -58,8 +70,12 @@ const AddLogModal = () => {
         </div>
     );
 };
+
+AddLogModal.propTypes = {
+    addLog: PropTypes.object.isRequired
+};
 const modalStyle = {
     width: '75%',
     height: '75%'
 };
-export default AddLogModal;
+export default connect(null, {addLog})(AddLogModal);
